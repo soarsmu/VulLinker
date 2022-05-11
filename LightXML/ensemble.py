@@ -22,7 +22,8 @@ if __name__ == '__main__':
     # You can list the transformer models used here
     # Currently we have tried:
     # bert-base, roberta, xlnet, docbert, longformer, and bigbird
-    berts = ['bert-base', 'docbert']
+    berts = ['bert-base', 'roberta', 'xlnet', 'longformer', 'bigbird']
+    # berts = ['bert-base', 'docbert']
     # berts = ['bert-base', 'longformer', 'bigbird']
 
     for index in range(len(berts)):
