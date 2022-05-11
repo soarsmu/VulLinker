@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.datasets import dump_svmlight_file
@@ -111,8 +112,14 @@ def prepare_lightxml_dataset():
     num_row_test = test_X.shape[0]
 
     # Dump the standard svmlight file
-    dump_svmlight_file(train_X, train_Y, "dataset/lightxml/train.txt", multilabel=True)
-    dump_svmlight_file(test_X, test_Y, "dataset/lightxml/test.txt", multilabel=True)
+    train_fpath = "dataset/lightxml/train.txt"
+    test_fpath = "dataset/lightxml/test.txt"
+
+    if not os.path.exists(os.path.dirname(train_fpath)) :
+        os.makedirs(os.path.dirname(train_fpath))
+
+    dump_svmlight_file(train_X, train_Y, train_fpath, multilabel=True)
+    dump_svmlight_file(test_X, test_Y, test_fpath, multilabel=True)
 
     train_text = []
     train_label = []
@@ -445,3 +452,8 @@ def prepare_xmlcnn_dataset():
             # finally, write the entry to the file
             w.write(entry + "\n")
     print("XML CNN dataset created successfully!!!")
+
+
+
+if __name__ == "__main__" :
+    prepare_lightxml_dataset()
