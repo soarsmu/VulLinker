@@ -2,6 +2,7 @@ from lib2to3.pgen2.tokenize import tokenize
 import sys
 import random
 import numpy as np
+import pandas as pd
 from apex import amp
 from model import LightXML
 import os
@@ -34,6 +35,32 @@ def init_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
+
+
+def createOneData(text:str):
+    labels = []
+    texts = []
+    dataType = []
+
+
+    texts.append(text.replace('\n', ''))
+    dataType.append('test')
+    labels.append('firefox')
+
+    assert len(texts) == len(labels) == len(dataType)
+
+    df_row = {'text': texts, 'label': labels, 'dataType': dataType}
+
+    df = pd.DataFrame(df_row)
+
+    return df
+
+
+def get_inverse_label_map(label_map):
+    inverse_label_map = {}
+    for k, v in label_map.items() :
+        inverse_label_map[v] = k
+    return inverse_label_map
 
 
 import argparse
@@ -80,6 +107,8 @@ if __name__ == '__main__':
     print(os.getcwd())
     df, label_map = createDataCSV(args.dataset)
     
+    inverse_label_map = get_inverse_label_map(label_map)
+    
     print(f'load {args.dataset} dataset with '
           f'{len(df[df.dataType =="train"])} train {len(df[df.dataType =="test"])} test with {len(label_map)} labels done')
 
@@ -102,12 +131,31 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(f'models/model-{get_exp_name()}.bin'))
     model = model.cuda()
 
-    print(len(df[df.dataType == 'test']))
-    model.one_epoch(0, validloader, None, mode='eval')
+    dummy_text = "mozilla seamonkey firefox thunderbird mozilla firefox esr vulnerability class javascript engine mozilla firefox firefox thunderbird seamonkey attackers memory consumption garbage collection objects com errata rhsa html http www org security dsa http lists security announce msg00017 html http www com usn http www oracle com technetwork topics security html https bugzilla mozilla org show bug cgi http lists security announce msg00016 html http www mozilla security announce mfsa2014 html http archives html http lists security announce msg00022 html http rhn errata rhsa html http www securityfocus http lists security announce msg00016 html security gentoo glsa http www org security dsa firefox thunderbird"
+    # dummy_text = "imagemagick attackers service segmentation fault application crash pnm file http com lists security https bugzilla show bug cgi http www openwall com lists security imagemagick"
+    # dummy_text = "oracle jdk jre vulnerability oracle java se java se java se attackers confidentiality integrity availability vectors lists security announce msg00047 html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http www securitytracker com http lists security announce msg00040 html http www org security dsa http lists security announce msg00039 html http www com usn security gentoo glsa http www oracle com technetwork topics security html http www securityfocus security gentoo glsa http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http www com usn http www org security dsa http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http lists security announce msg00046 html http rhn errata rhsa html"
+    df = createOneData(text=dummy_text)
 
-    pred_scores, pred_labels = model.one_epoch(0, testloader, None, mode='test')
-    np.save(f'results/{get_exp_name()}-labels.npy', np.array(pred_labels))
-    np.save(f'results/{get_exp_name()}-scores.npy', np.array(pred_scores))
+    dataloader = DataLoader(MDataset(df, 'test', tokenizer, label_map, args.max_len),
+                            batch_size=args.batch, num_workers=0,
+                            shuffle=False)
+    
+    predicts = []
+    predicts.append(torch.Tensor(model.one_epoch(0, dataloader, None, mode='test')[0]))
+
+    prediction = ""
+
+    for index, true_labels in enumerate(df.label.values):
+        true_labels = set([label_map[i] for i in true_labels.split()])
+
+        logits = [torch.sigmoid(predicts[index])]
+        logits = [(-i).argsort()[:10].cpu().numpy() for i in logits]
+
+        # print(logits[0][0][0])
+        prediction = inverse_label_map[logits[0][0][0]]
+
+    print("Input text: ", dummy_text)
+    print("Prediction: ", prediction)
 
     # python inference.py --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  
 
