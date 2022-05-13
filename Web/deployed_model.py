@@ -39,10 +39,3 @@ model = LightXML(n_labels=len(label_map), bert=bert,
 model.load_state_dict(torch.load(
     f'../LightXML/models/model-{get_exp_name()}.bin'))
 tokenizer = model.get_tokenizer()
-
-print("MODEL")
-print("MODEL")
-print("MODEL")
-print("MODEL")
-print("MODEL")
-# print(model)
