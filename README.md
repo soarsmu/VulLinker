@@ -95,3 +95,19 @@ Omikuji is the name of the library that provides the implementation of both Bons
 
 ## LightXML
 
+
+
+## Deployment - Deploy LightXML models
+
+Deploy the model using Django
+```
+# don't forget to use absolute path
+docker run --rm --name=xml --gpus '"device=0,1"' --shm-size 32G -it --mount type=bind,src=<absolute path to the folder>,dst=<folder name>/ -p 8000:8000 username/xml
+cd <folder name>/Web/
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
+```
+
+You can try to open 0.0.0.0:8000 on your browser to check the prediction. Alternatively, you can check the prediction from command line by `curl http://0.0.0.0:8000/predict/?input_text=imagemagick+attackers+service+segmentation`
+
+
