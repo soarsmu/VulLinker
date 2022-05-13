@@ -41,15 +41,16 @@ def get_inverse_label_map(label_map):
     return inverse_label_map
 
 
-def get_prediction(name: str) -> str:
+def get_prediction(input_text: str) -> str:
 
     model.cuda()
 
     # dummy_text = "mozilla seamonkey firefox thunderbird mozilla firefox esr vulnerability class javascript engine mozilla firefox firefox thunderbird seamonkey attackers memory consumption garbage collection objects com errata rhsa html http www org security dsa http lists security announce msg00017 html http www com usn http www oracle com technetwork topics security html https bugzilla mozilla org show bug cgi http lists security announce msg00016 html http www mozilla security announce mfsa2014 html http archives html http lists security announce msg00022 html http rhn errata rhsa html http www securityfocus http lists security announce msg00016 html security gentoo glsa http www org security dsa firefox thunderbird"
     # dummy_text = "imagemagick attackers service segmentation fault application crash pnm file http com lists security https bugzilla show bug cgi http www openwall com lists security imagemagick"
     # dummy_text = "oracle jdk jre vulnerability oracle java se java se java se attackers confidentiality integrity availability vectors lists security announce msg00047 html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http www securitytracker com http lists security announce msg00040 html http www org security dsa http lists security announce msg00039 html http www com usn security gentoo glsa http www oracle com technetwork topics security html http www securityfocus security gentoo glsa http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http www com usn http www org security dsa http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http rhn errata rhsa html http lists security announce msg00046 html http rhn errata rhsa html"
-    dummy_text = name
-    df = createOneData(text=dummy_text)
+    # input_text = dummy_text # for debugging
+    
+    df = createOneData(text=input_text)
 
     max_len = 512
     batch = 1
@@ -62,7 +63,7 @@ def get_prediction(name: str) -> str:
     predicts.append(torch.Tensor(model.one_epoch(
         0, dataloader, None, mode='test')[0]))
 
-    prediction = ""
+    prediction_labels = []
 
     for index, true_labels in enumerate(df.label.values):
         true_labels = set([label_map[i] for i in true_labels.split()])
@@ -71,14 +72,15 @@ def get_prediction(name: str) -> str:
         logits = [(-i).argsort()[:10].cpu().numpy() for i in logits]
 
         # print(logits[0][0][0])
-        prediction = inverse_label_map[logits[0][0][0]]
+        prediction_ids = logits[0][0][:3]
 
-    print("Input text: ", dummy_text)
-    print("Prediction: ", prediction)
+        for prediction_id in prediction_ids :
+            prediction_labels.append(inverse_label_map[prediction_id])
 
-    return prediction
+    print("Input text: ", input_text)
+    print("Predictions: ", prediction_labels)
 
-
+    return prediction_labels   
 
 
 # our result page view
