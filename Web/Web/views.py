@@ -85,8 +85,8 @@ def get_prediction(input_text: str) -> str:
 
 # our result page view
 def predict(request):
-    name = request.GET['name']
+    input_text = request.GET['name']
     
-    result = get_prediction(name)
+    result = get_prediction(input_text)
 
     return render(request, 'predict.html', {'result': result})
