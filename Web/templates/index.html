@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>Home page</title>
+</head>
+
+<body>
+    <h1>Gender Prediction</h1>
+    <form action="{% url 'predict' %}">
+
+        <p>Name:</p>
+        <input type="text" name="name">
+        <br>
+
+        <input type="submit" value='Get Prediction'>
+    </form>
+</body>
+
+</html>
