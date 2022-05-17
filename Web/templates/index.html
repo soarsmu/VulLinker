@@ -8,14 +8,31 @@
 
 <body>
     <h1>Library Identification from Vulnerabilities</h1>
-    <form action="{% url 'predict' %}">
 
-        <p>Input text:</p>
+    <form action="{% url 'predict_by_cve_id' %}">
+    
+        <p>CVE ID:</p>
+        <input type="text" id="cve_id" name="cve_id" size="50">
+        <br>
+    
+        <input type="submit" value='Get Prediction by CVE ID'>
+    </form>
+
+    <br>
+    <br>
+    <p>OR</p>
+    <br>
+
+    <form action="{% url 'predict' %}">
+    
+        <p>CVE Description text:</p>
         <input type="text" id="input_text" name="input_text" size="100">
         <br>
-
-        <input type="submit" value='Get Prediction'>
+    
+        <input type="submit" value='Get Prediction by CVE Description'>
     </form>
+
+
 </body>
 
 </html>
