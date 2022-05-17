@@ -24,4 +24,5 @@ urlpatterns = [
     # configure home page (default view) and result web page
     path('', views.home, name='home'),
     path('predict/', views.predict, name='predict'),
+    path('predict_by_cve_id/', views.predict_by_cve_id, name='predict_by_cve_id'),
 ]
