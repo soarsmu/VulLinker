@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
+from crawling_reference import crawl_bugs_launchpad
 import nvdlib
 
 
@@ -107,5 +108,10 @@ def predict_by_cve_id(request):
     reference_links = []
     for ref in .cve.references.reference_data:
         reference_links.append(ref.url)
+    reference_descs = []
+    for ref in reference_links:
+        if urlparse(ref).netloc == "bugs.launchpad.net":
+            reference_descs.append(crawl_bugs_launchpad(ref))
+    result=get_prediction(description)
 
     return render(request, 'predict.html', {'result': result})
