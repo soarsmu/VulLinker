@@ -7,6 +7,7 @@ import sys
 import torch
 import torch
 from torch.utils.data import DataLoader
+from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
@@ -93,6 +94,7 @@ def predict(request):
     return render(request, 'predict.html', {'result': result})
 
 
+
 def predict_by_cve_id(request):
     """make a prediction by using cve id. Get the vulnerability description from NVD database.
     Use https://github.com/vehemont/nvdlib to obtain the vulnerability description using the cve id from the NVD database.
@@ -102,7 +104,8 @@ def predict_by_cve_id(request):
     r = nvdlib.getCVE(cve_id)
     
     description = r.cve.description.description_data[0].value
-    
-    result=get_prediction(description)
+    reference_links = []
+    for ref in .cve.references.reference_data:
+        reference_links.append(ref.url)
 
     return render(request, 'predict.html', {'result': result})
