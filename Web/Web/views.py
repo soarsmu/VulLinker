@@ -106,7 +106,7 @@ def predict_by_cve_id(request):
     
     description = r.cve.description.description_data[0].value
     reference_links = []
-    for ref in .cve.references.reference_data:
+    for ref in r.cve.references.reference_data:
         reference_links.append(ref.url)
     reference_descs = []
     for ref in reference_links:
