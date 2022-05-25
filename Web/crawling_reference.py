@@ -270,3 +270,23 @@ def crawl_lists_opensuse(CVE,URL):
     except Exception as e: 
         description = ""
     return description
+
+def crawl_fedora_pipermail(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        description = soup.find_all("title")[0].text.split("Update: ")[1].strip()
+        description = _RE_COMBINE_WHITESPACE.sub(" ", description)
+    except Exception as e: 
+        description = ""
+    return description
+
+def crawl_fedora_archives(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        description = soup.find_all("div", class_="col-tn-10")[0].text.split("Update: ")[1].strip()
+        description = _RE_COMBINE_WHITESPACE.sub(" ", description)
+    except Exception as e: 
+        description = ""
+    return description

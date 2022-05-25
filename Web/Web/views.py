@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, crawl_lists_opensuse
+from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives
 import nvdlib
 
 
@@ -132,6 +132,11 @@ def predict_by_cve_id(request):
             reference_descs.append(crawl_oracle(ref))
         elif "lists.opensuse.org" in short_ref:
             reference_descs.append(crawl_lists_opensuse(cve_id,ref))
+        elif "fedoraproject.org" in short_ref:
+            if "/pipermail/" in ref:
+                reference_descs.append(crawl_fedora_pipermail(ref))
+            elif "/archives/list/" in ref:
+                reference_descs.append(crawl_fedora_archives(ref))
 
     result=get_prediction(description)
 
