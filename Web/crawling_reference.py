@@ -225,3 +225,48 @@ def crawl_oracle(URL):
     except Exception as e: 
         description = ""
     return description
+
+
+def crawl_lists_opensuse(CVE,URL):
+    try:
+        re = requests.get(URL)
+        soup = BeautifulSoup(re.text, "html.parser")  
+        body = soup.find_all("div", {"class": "email-body"})
+        test = str(body).splitlines()
+
+        go = False
+        go2 = False
+        go3 = False
+        aff_p = []
+        fin_aff_p = []
+        desc = ""
+        for x in test:
+            x = str(x.strip())
+            if len(x) != 0:
+                if "______________________________________________________________________________" in x:
+                    go = False
+                    fin_aff_p = aff_p 
+
+                if go:
+                    aff_p.append(x)
+
+                if "Affected Products" in x:
+                    go = True
+
+                if "Description:" in x:
+                    go2 = True 
+
+                if go2:
+                    if ("-" == x[0] or "*" == x[0]) and CVE in x:
+                        go3 = True
+
+                    if (("-" == x[0] or "*" == x[0]) and CVE not in x) or "Patch Instructions:" in x:
+                        go3 = False
+                        description = ""
+                        description += desc[desc.find(":")+2:]
+
+                if go3:
+                    desc += x + " "
+    except Exception as e: 
+        description = ""
+    return description
