@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall
+from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat
 import nvdlib
 
 
@@ -111,10 +111,16 @@ def predict_by_cve_id(request):
         reference_links.append(ref.url)
     reference_descs = []
     for ref in reference_links:
-        if urlparse(ref).netloc == "bugs.launchpad.net":
+        short_ref = urlparse(ref).netloc
+        if "bugs.launchpad.net" in short_ref:
             reference_descs.append(crawl_bugs_launchpad(ref))
-        elif "openwall.com" in urlparse(ref).netloc:
+        elif "openwall.com" in short_ref:
             reference_descs.append(crawl_openwall(ref))
+        elif "redhat.com" in short_ref:
+            if "bugzilla" in short_ref:
+                reference_descs.append(crawl_bugzilla_redhat(ref))
+            else:
+                reference_descs.append(crawl_access_redhat(cve_id,ref))
 
     result=get_prediction(description)
 
