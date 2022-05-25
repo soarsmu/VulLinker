@@ -347,3 +347,40 @@ def crawl_security_tracker(URL):
     except Exception as e: 
         description = ""
     return description
+
+def crawl_usn_ubuntu(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        packages = ""
+        job_elements = soup.find_all("div", class_="col-12")[2].find_all("li", class_="p-list__item")
+        for element in job_elements:
+            element = element.text
+            element = element.strip()
+            element = _RE_COMBINE_WHITESPACE.sub(" ",element)
+            packages += f"{element}. "
+        packages = packages.strip()
+        packages = _RE_COMBINE_WHITESPACE.sub(" ",packages)
+        details = soup.find_all("div",class_="col-8")[0].find_all("p")[0].text.strip()
+        details = _RE_COMBINE_WHITESPACE.sub(" ",details)
+        descriptions = packages + " " + details
+    except Exception as e: 
+        description = ""
+    return description
+
+def crawl_ubuntu(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        packages = ""
+        for package in soup.find_all("div", class_="col-12")[2].find_all("li"):
+            packages += f"{package.text}. "
+        packages = packages.strip()
+        packages = _RE_COMBINE_WHITESPACE.sub(" ", packages)
+        details = soup.find_all("div", class_="col-8")[0].find_all("p")[0].text
+        details = details.strip()
+        details = _RE_COMBINE_WHITESPACE.sub(" ", details)
+        descriptions = packages + " " + details
+    except Exception as e: 
+        description = ""
+    return description
