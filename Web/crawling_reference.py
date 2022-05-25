@@ -115,8 +115,8 @@ def crawl_rhn_redhat(URL):
         descriptions = soup.find_all("div", {"id": "description"})
         description = ""
         for x in descriptions:
-        	for y in x.find_all('p'):
-	            description += y.text +" "
+            for y in x.find_all('p'):
+                description += y.text +" "
     except Exception as e: 
         description = ""
     return description
@@ -188,3 +188,40 @@ def crawl_debian(URL):
         description = ""
     return description
 
+
+def crawl_oracle(URL):
+    try:
+        re = requests.get(URL)
+        soup = BeautifulSoup(re.text, "html.parser")  
+        test = str(soup).splitlines()
+        
+        go = False
+        aff_p = []
+        product = ""
+        counter = 0
+        for x in test:
+            if counter == 2:
+                go = False
+                counter = 0
+                aff_p.append(product)
+                product = ""
+            if go and counter < 2:
+                product += x[4:len(x)-5] + " "
+                counter += 1
+            if ">CVE-2019-0190<" in x:
+                go = True
+                
+        description = ""
+        for header in soup.find_all('h3', string="Description"):
+            nextNode = header
+            while True:
+                nextNode = nextNode.nextSibling
+                if nextNode is None:
+                    break
+                if nextNode.name is not None:
+                    if nextNode.name == "h3":
+                        break
+                    description += nextNode.get_text(strip=True)
+    except Exception as e: 
+        description = ""
+    return description
