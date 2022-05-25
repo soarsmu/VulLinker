@@ -106,6 +106,21 @@ def crawl_access_redhat(CVE,URL):
         description = ""
     return description
 
+def crawl_rhn_redhat(URL):
+    try:
+        re = requests.get(URL)
+        soup = BeautifulSoup(re.text, "html.parser")
+        
+        #obtained scraped features by extracting associated elements: (description, affected_products)
+        descriptions = soup.find_all("div", {"id": "description"})
+        description = ""
+        for x in descriptions:
+        	for y in x.find_all('p'):
+	            description += y.text +" "
+    except Exception as e: 
+        description = ""
+    return description
+
 
 def crawl_lists_debian(URL):
     try:
@@ -172,3 +187,4 @@ def crawl_debian(URL):
     except Exception as e: 
         description = ""
     return description
+

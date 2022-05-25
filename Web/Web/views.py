@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_lists_debian, crawl_debian
+from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian
 import nvdlib
 
 
@@ -119,8 +119,10 @@ def predict_by_cve_id(request):
         elif "redhat.com" in short_ref:
             if "bugzilla" in short_ref:
                 reference_descs.append(crawl_bugzilla_redhat(ref))
-            else:
+            elif "access" in short_ref:
                 reference_descs.append(crawl_access_redhat(cve_id,ref))
+            else:
+                reference_descs.append(crawl_rhn_redhat(ref))
     elif "debian.org" in short_ref:
         if "lists" in short_ref:
             reference_descs.append(crawl_lists_debian(ref))
