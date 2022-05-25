@@ -137,6 +137,8 @@ def predict_by_cve_id(request):
                 reference_descs.append(crawl_fedora_pipermail(ref))
             elif "/archives/list/" in ref:
                 reference_descs.append(crawl_fedora_archives(ref))
+        elif "github" in short_ref:
+            reference_descs.append(crawl_github(ref))
 
     result=get_prediction(description)
 

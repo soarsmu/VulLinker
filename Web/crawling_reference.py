@@ -290,3 +290,20 @@ def crawl_fedora_archives(URL):
     except Exception as e: 
         description = ""
     return description
+
+def crawl_github(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        try:
+            root_repo = soup.find_all("a", class_="url fn")[0].text.strip()
+        except:
+            root_repo = ""
+        try:
+            sub_directory = soup.find_all("div",class_="flex-auto min-width-0 width-fit mr-3")[0].find("strong").find("a").text.strip()
+        except:
+            sub_directory = ""
+        description = root_repo + " " + sub_directory
+    except Exception as e: 
+        description = ""
+    return description
