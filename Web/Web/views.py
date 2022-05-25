@@ -11,7 +11,11 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives, crawl_security_gentoo, crawl_security_gentoo_xml, crawl_security_gentoo_blogs, crawl_security_tracker, crawl_usn_ubuntu, crawl_ubuntu
+from crawling_reference import (crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, 
+    crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, 
+    crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives, crawl_security_gentoo, 
+    crawl_security_gentoo_xml, crawl_security_gentoo_blogs, crawl_security_tracker, crawl_usn_ubuntu, 
+    crawl_ubuntu, crawl_github)
 import nvdlib
 
 
@@ -149,7 +153,7 @@ def predict_by_cve_id(request):
         elif "securitytracker" in short_ref:
             reference_descs.append(crawl_security_tracker(ref))
         elif "ubuntu" in short_ref:
-            if "usn" in short_ref:
+            if "usn.ubuntu" in short_ref:
                 reference_descs.append(crawl_usn_ubuntu(ref))
             else:
                 reference_descs.append(crawl_ubuntu(ref))
