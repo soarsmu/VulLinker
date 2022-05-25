@@ -7,9 +7,11 @@ import sys
 import torch
 import torch
 from torch.utils.data import DataLoader
+from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
+from crawling_reference import crawl_bugs_launchpad, crawl_openwall
 import nvdlib
 
 
@@ -93,6 +95,7 @@ def predict(request):
     return render(request, 'predict.html', {'result': result})
 
 
+
 def predict_by_cve_id(request):
     """make a prediction by using cve id. Get the vulnerability description from NVD database.
     Use https://github.com/vehemont/nvdlib to obtain the vulnerability description using the cve id from the NVD database.
@@ -100,9 +103,19 @@ def predict_by_cve_id(request):
     cve_id = request.GET['cve_id']
 
     r = nvdlib.getCVE(cve_id)
-    
+        
     description = r.cve.description.description_data[0].value
     
+    reference_links = []
+    for ref in r.cve.references.reference_data:
+        reference_links.append(ref.url)
+    reference_descs = []
+    for ref in reference_links:
+        if urlparse(ref).netloc == "bugs.launchpad.net":
+            reference_descs.append(crawl_bugs_launchpad(ref))
+        elif "openwall.com" in urlparse(ref).netloc:
+            reference_descs.append(crawl_openwall(ref))
+
     result=get_prediction(description)
 
     return render(request, 'predict.html', {'result': result})
