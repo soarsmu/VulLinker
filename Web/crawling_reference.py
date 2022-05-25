@@ -307,3 +307,33 @@ def crawl_github(URL):
     except Exception as e: 
         description = ""
     return description
+
+def crawl_security_gentoo(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        description = soup.find_all("div", class_="col-12 col-md-10")[0].find_all("p")[2].text.strip()
+        description = _RE_COMBINE_WHITESPACE.sub(" ",description)
+    except Exception as e: 
+        description = ""
+    return description
+
+def crawl_security_gentoo_xml(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        description = soup.find_all("div",class_="col-12 col-md-10")[0].find_all("p")[2].text.strip()
+        description = _RE_COMBINE_WHITESPACE.sub(" ", description)
+    except Exception as e: 
+        description = ""
+    return description
+
+def crawl_security_gentoo_blogs(URL):
+    try:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        description = soup.find_all("h1", class_="entry-title")[0].text.strip()
+        description = _RE_COMBINE_WHITESPACE.sub(" ", description)
+    except Exception as e: 
+        description = ""
+    return description
