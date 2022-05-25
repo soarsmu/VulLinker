@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives, crawl_security_gentoo, crawl_security_gentoo_xml, crawl_security_gentoo_blogs
+from crawling_reference import crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives, crawl_security_gentoo, crawl_security_gentoo_xml, crawl_security_gentoo_blogs, crawl_security_tracker
 import nvdlib
 
 
@@ -146,6 +146,8 @@ def predict_by_cve_id(request):
                 reference_descs.append(crawl_security_gentoo_blogs(ref))
             elif "security.gentoo.org" in ref:
                 reference_descs.append(crawl_security_gentoo(ref))
+        elif "securitytracker" in short_ref:
+            reference_descs.append(crawl_security_tracker(ref))
 
     result=get_prediction(description)
 
