@@ -107,3 +107,68 @@ def crawl_access_redhat(CVE,URL):
     return description
 
 
+def crawl_lists_debian(URL):
+    try:
+        re = requests.get(URL)
+        soup = BeautifulSoup(re.text, "html.parser")
+        soup = str(soup)
+        
+        test = soup[soup.find("<pre>")+5:soup.find("</pre>")]
+        test = test.splitlines()
+        
+        # Affected products logic variables
+        affp_go_1 = False
+        affp_go_2 = False
+        affp = ""
+        
+        # CVE Description logic variables
+        description_go = False
+        description_go_count = 0
+        description = ""
+        
+        for x in test:
+            
+            # Affected products logic
+            if affp_go_2:
+                if x != "":
+                    affp += x + " "
+                if x == "" and affp != "":
+                    affp_go_1 = False
+                    affp_go_2 = False
+            if affp_go_1:
+                if x == "":
+                    affp_go_2 = True
+            if "debian bug" in x.lower():
+                affp_go_1 = True
+                
+            # CVE description logic
+            if description_go:
+                if x != "":
+                    description += x 
+                else:
+                    description_go_count += 1
+                    if description_go_count == 2:
+                        description_go = False
+                    
+            if y[0] == x:
+                description_go = True
+                
+        description = description.strip()
+        description = description.replace("  ", " ")
+        description = description.replace("  ", " ")
+    except Exception as e: 
+        description = ""
+    return description
+
+
+def crawl_debian(URL):
+    try:
+        re = requests.get(URL)
+        soup = BeautifulSoup(re.text, "html.parser")  
+        body = str(soup.find_all("div", {"id": "content"}))  
+        new_body = body[body.find("More information"):]
+        
+        description = new_body[new_body.find("<p>")+3: new_body.find("</p>")]
+    except Exception as e: 
+        description = ""
+    return description
