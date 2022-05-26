@@ -14,8 +14,11 @@ TEST_PATH = "dataset/dataset_test.csv"
 FEATURE_NAME = "merged"
 DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
 
-# NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged"]
-NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
+## use this for the original csv file from ICPC paper
+NON_LABEL_COLUMNS = ["cve_id", "description_text", "cpe_text", "merged"]
+
+## use this for the new combined description and reference data
+# NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
 
 
 # According to the usual division, we divide the dataset into 0.75:0.25 between the training and test data
@@ -155,9 +158,9 @@ def prepare_extreme_text_dataset(INPUT_DATASET, TRAINING_OUTPUT, TEST_OUTPUT, la
     cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     # Initiate the dataframe containing the labels for each CVE
     pd_labels = pd.read_csv(TRAIN_PATH,
-                            usecols=[i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]])
+                            usecols=[i for i in cols if i not in NON_LABEL_COLUMNS])
     # Initiate a list which contain the list of labels considered in te dataset
-    list_labels = [i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]]
+    list_labels = [i for i in cols if i not in NON_LABEL_COLUMNS]
 
     # Splitting using skmultilearn iterative train test split
     # train, label_train, test, label_test = iterative_train_test_split(data, labels, test_size=0.25)
