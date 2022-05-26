@@ -8,7 +8,8 @@ import json
 import sklearn
 import pickle
 
-DATASET_PATH = "dataset/dataset_train.csv"
+TRAIN_PATH = "dataset/dataset_train.csv"
+TEST_PATH = "dataset/dataset_test.csv"
 
 # According to the usual division, we divide the dataset into 0.75:0.25 between the training and test data
 # the splitted result will be saved in the dataset/splitted folder into 4 different files:
@@ -16,15 +17,15 @@ DATASET_PATH = "dataset/dataset_train.csv"
 # splitted_train_y = label for training data
 # splitted_test_x = test data
 # splitted_test_y = label for test data
-def split_dataset(INPUT_DATASET):
+def split_dataset():
     description_fields = ["cve_id", "merged"]
     # Initiate the dataframe containing the CVE ID and its description
     # Change the "merged" field in the description_fields variable to use other text feature such as reference
-    df = pd.read_csv(DATASET_PATH, usecols=description_fields)
+    df = pd.read_csv(TRAIN_PATH, usecols=description_fields)
     # Read column names from file
-    cols = list(pd.read_csv(DATASET_PATH, nrows=1))
+    cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     # Initiate the dataframe containing the labels for each CVE
-    pd_labels = pd.read_csv(DATASET_PATH,
+    pd_labels = pd.read_csv(TRAIN_PATH,
                             usecols=[i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]])
     # Initiate a list which contain the list of labels considered in te dataset
     list_labels = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
@@ -43,8 +44,6 @@ def split_dataset(INPUT_DATASET):
 # this function is used to save the splitted dataset as numpy file
 # use this function if the csv files are already splitted into the test and train dataset
 def save_splitted_dataset_as_numpy():
-    TRAIN_PATH = "dataset/dataset_train.csv"
-    TEST_PATH = "dataset/dataset_test.csv"
     description_fields = ["cve_id", "merged"]
     # Initiate the dataframe containing the CVE ID and its description
     # Change the "merged" field in the description_fields variable to use other text feature such as reference
@@ -91,7 +90,7 @@ def prepare_lightxml_dataset():
     label_test = np.load("dataset/splitted/splitted_test_y.npy", allow_pickle=True)
     train_corpus = train[:, 1].tolist()
     test_corpus = test[:, 1].tolist()
-    cols = list(pd.read_csv(DATASET_PATH, nrows=1))
+    cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     label_columns = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
     num_labels = len(label_columns)
 
@@ -129,7 +128,7 @@ def prepare_lightxml_dataset():
     cve_labels = pd.read_csv("dataset/cve_labels_merged_cleaned.csv")
 
 
-    train_data = pd.read_csv("dataset/splitted/dataset_train.csv")
+    train_data = pd.read_csv(TRAIN_PATH)
     # process the label and text here
     for index, row in train_data.iterrows():
         train_text.append(row.merged.lstrip().rstrip())
@@ -144,7 +143,7 @@ def prepare_lightxml_dataset():
         # print(label_string)
         train_label.append(label_string)
 
-    test_data = pd.read_csv("dataset/splitted/dataset_test.csv")
+    test_data = pd.read_csv(TEST_PATH)
     for index, row in test_data.iterrows():
         test_text.append(row.merged.lstrip().rstrip())
         # for label below
@@ -184,9 +183,9 @@ def prepare_lightxml_dataset():
 # This function assume that the splitted dataset is available in dataset/splitted folder
 def prepare_extreme_text_dataset(INPUT_DATASET, TRAINING_OUTPUT, TEST_OUTPUT, label_prefix = "__label__"):
     # Read column names from file
-    cols = list(pd.read_csv(DATASET_PATH, nrows=1))
+    cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     # Initiate the dataframe containing the labels for each CVE
-    pd_labels = pd.read_csv(DATASET_PATH,
+    pd_labels = pd.read_csv(TRAIN_PATH,
                             usecols=[i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]])
     # Initiate a list which contain the list of labels considered in te dataset
     list_labels = [i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]]
@@ -265,7 +264,7 @@ def prepare_omikuji_dataset():
     label_test = np.load("dataset/splitted/splitted_test_y.npy", allow_pickle=True)
     train_corpus = train[:, 1].tolist()
     test_corpus = test[:, 1].tolist()
-    cols = list(pd.read_csv(DATASET_PATH, nrows=1))
+    cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     label_columns = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
     num_labels = len(label_columns)
 
