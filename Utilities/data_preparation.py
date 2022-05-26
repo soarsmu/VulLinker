@@ -11,6 +11,13 @@ import pickle
 TRAIN_PATH = "dataset/dataset_train.csv"
 TEST_PATH = "dataset/dataset_test.csv"
 
+FEATURE_NAME = "merged"
+DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
+
+# NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged"]
+NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
+
+
 # According to the usual division, we divide the dataset into 0.75:0.25 between the training and test data
 # the splitted result will be saved in the dataset/splitted folder into 4 different files:
 # splitted_train_x = training data (description/reference/etc.)
@@ -18,7 +25,7 @@ TEST_PATH = "dataset/dataset_test.csv"
 # splitted_test_x = test data
 # splitted_test_y = label for test data
 def split_dataset():
-    description_fields = ["cve_id", "merged"]
+    description_fields = DESCRIPTION_FIELDS
     # Initiate the dataframe containing the CVE ID and its description
     # Change the "merged" field in the description_fields variable to use other text feature such as reference
     df = pd.read_csv(TRAIN_PATH, usecols=description_fields)
@@ -26,9 +33,9 @@ def split_dataset():
     cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     # Initiate the dataframe containing the labels for each CVE
     pd_labels = pd.read_csv(TRAIN_PATH,
-                            usecols=[i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]])
+                            usecols=[i for i in cols if i not in NON_LABEL_COLUMNS])
     # Initiate a list which contain the list of labels considered in te dataset
-    list_labels = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
+    list_labels = [i for i in cols if i not in NON_LABEL_COLUMNS]
     # Convert to numpy for splitting
     data = df.to_numpy()
     labels = pd_labels.to_numpy()
@@ -44,7 +51,7 @@ def split_dataset():
 # this function is used to save the splitted dataset as numpy file
 # use this function if the csv files are already splitted into the test and train dataset
 def save_splitted_dataset_as_numpy():
-    description_fields = ["cve_id", "merged"]
+    description_fields = DESCRIPTION_FIELDS
     # Initiate the dataframe containing the CVE ID and its description
     # Change the "merged" field in the description_fields variable to use other text feature such as reference
 
@@ -91,7 +98,7 @@ def prepare_lightxml_dataset():
     train_corpus = train[:, 1].tolist()
     test_corpus = test[:, 1].tolist()
     cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
-    label_columns = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
+    label_columns = [i for i in cols if i not in NON_LABEL_COLUMNS]
     num_labels = len(label_columns)
 
     vectorizer = TfidfVectorizer().fit(train_corpus)
@@ -265,7 +272,7 @@ def prepare_omikuji_dataset():
     train_corpus = train[:, 1].tolist()
     test_corpus = test[:, 1].tolist()
     cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
-    label_columns = [i for i in cols if i not in ["cve_id", "cleaned", "matchers", "merged"]]
+    label_columns = [i for i in cols if i not in NON_LABEL_COLUMNS]
     num_labels = len(label_columns)
 
     vectorizer = TfidfVectorizer().fit(train_corpus)
