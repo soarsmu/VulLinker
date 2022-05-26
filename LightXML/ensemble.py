@@ -22,6 +22,7 @@ if __name__ == '__main__':
     # You can list the transformer models used here
     # Currently we have tried:
     # bert-base, roberta, xlnet, docbert, longformer, and bigbird
+    # berts = ['bert-base']
     berts = ['bert-base', 'roberta', 'xlnet', 'longformer', 'bigbird']
     # berts = ['bert-base', 'docbert']
     # berts = ['bert-base', 'longformer', 'bigbird']
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 
         model = LightXML(n_labels=len(label_map), bert=berts[index])
 
-        print(f'models/model-model_name.bin')
+        print(f'models/model-{model_name}.bin')
         model.load_state_dict(torch.load(f'models/model-{model_name}.bin'))
 
         tokenizer = model.get_tokenizer()
