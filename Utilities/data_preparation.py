@@ -48,44 +48,6 @@ def split_dataset():
     np.save("dataset/splitted/splitted_test_y.npy", label_test, allow_pickle=True)
 
 
-# this function is used to save the splitted dataset as numpy file
-# use this function if the csv files are already splitted into the test and train dataset
-def save_splitted_dataset_as_numpy():
-    description_fields = DESCRIPTION_FIELDS
-    # Initiate the dataframe containing the CVE ID and its description
-    # Change the "merged" field in the description_fields variable to use other text feature such as reference
-
-    # Process the training dataset
-
-    df = pd.read_csv(TRAIN_PATH, usecols=description_fields)
-    # Read column names from file
-    cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
-    # Initiate the dataframe containing the labels for each CVE
-
-    pd_labels = pd.read_csv(TRAIN_PATH,
-                            usecols=[i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]])
-    # Initiate a list which contain the list of labels considered in te dataset
-    list_labels = [i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]]
-
-    # Convert to numpy for splitting
-    train = df.to_numpy()
-    label_train = pd_labels.to_numpy()
-    # Splitting using skmultilearn iterative train test split
-
-    df_test = pd.read_csv(TEST_PATH, usecols=description_fields)
-    pd_labels_test = pd.read_csv(TEST_PATH,
-                            usecols=[i for i in cols if i not in ["cve_id", "description_text", "cpe_text", "merged"]])
-    test = df_test.to_numpy()
-    label_test = pd_labels_test.to_numpy()
-
-
-    # Save the splitted data to files
-    np.save("dataset/splitted/splitted_train_x.npy", train, allow_pickle=True)
-    np.save("dataset/splitted/splitted_train_y.npy", label_train, allow_pickle=True)
-    np.save("dataset/splitted/splitted_test_x.npy", test, allow_pickle=True)
-    np.save("dataset/splitted/splitted_test_y.npy", label_test, allow_pickle=True)
-
-
 # the test and train data are the same with omikuji
 # however, you need to create the train/test_labels.txt and train/test_texts.txt
 # with each row contains the text and labels for the train/test data
