@@ -11,7 +11,11 @@ from urllib.parse import urlparse
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
-from crawling_reference import crawl_bugs_launchpad, crawl_openwall
+from crawling_reference import (crawl_bugs_launchpad, crawl_openwall, crawl_bugzilla_redhat, 
+    crawl_access_redhat, crawl_rhn_redhat, crawl_lists_debian, crawl_debian, crawl_oracle, 
+    crawl_lists_opensuse, crawl_fedora_pipermail, crawl_fedora_archives, crawl_security_gentoo, 
+    crawl_security_gentoo_xml, crawl_security_gentoo_blogs, crawl_security_tracker, crawl_usn_ubuntu, 
+    crawl_ubuntu, crawl_github)
 import nvdlib
 
 
@@ -111,10 +115,50 @@ def predict_by_cve_id(request):
         reference_links.append(ref.url)
     reference_descs = []
     for ref in reference_links:
-        if urlparse(ref).netloc == "bugs.launchpad.net":
+        short_ref = urlparse(ref).netloc
+        if "bugs.launchpad.net" in short_ref:
             reference_descs.append(crawl_bugs_launchpad(ref))
-        elif "openwall.com" in urlparse(ref).netloc:
+        elif "openwall.com" in short_ref:
             reference_descs.append(crawl_openwall(ref))
+        elif "redhat.com" in short_ref:
+            if "bugzilla" in short_ref:
+                reference_descs.append(crawl_bugzilla_redhat(ref))
+            elif "access" in short_ref:
+                reference_descs.append(crawl_access_redhat(cve_id,ref))
+            else:
+                reference_descs.append(crawl_rhn_redhat(ref))
+        elif "debian.org" in short_ref:
+            if "lists" in short_ref:
+                reference_descs.append(crawl_lists_debian(ref))
+            else:
+                reference_descs.append(crawl_debian(ref))
+        elif "oracle.com" in short_ref:
+            reference_descs.append(crawl_oracle(ref))
+        elif "lists.opensuse.org" in short_ref:
+            reference_descs.append(crawl_lists_opensuse(cve_id,ref))
+        elif "fedoraproject.org" in short_ref:
+            if "/pipermail/" in ref:
+                reference_descs.append(crawl_fedora_pipermail(ref))
+            elif "/archives/list/" in ref:
+                reference_descs.append(crawl_fedora_archives(ref))
+        elif "github" in short_ref:
+            reference_descs.append(crawl_github(ref))
+        elif "gentoo.org" in short_ref:
+            if "security.gentoo.org/glsa/" in ref:
+                reference_descs.append(crawl_security_gentoo_xml(ref))
+            elif "blogs.gentoo.org/ago" in ref:
+                reference_descs.append(crawl_security_gentoo_blogs(ref))
+            elif "security.gentoo.org" in ref:
+                reference_descs.append(crawl_security_gentoo(ref))
+        elif "securitytracker" in short_ref:
+            reference_descs.append(crawl_security_tracker(ref))
+        elif "ubuntu" in short_ref:
+            if "usn.ubuntu" in short_ref:
+                reference_descs.append(crawl_usn_ubuntu(ref))
+            else:
+                reference_descs.append(crawl_ubuntu(ref))
+        else:
+            reference_descs.append("")
 
     result=get_prediction(description)
 
