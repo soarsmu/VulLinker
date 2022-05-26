@@ -83,4 +83,14 @@ elif [ "$1" = "cve_data" ]; then
     # python main.py --lr 1e-4 --epoch 20 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert docbert
 
     python ensemble.py --dataset cve_data
+elif [ "$1" = "cve_data_with_reference_splitted_by_year" ]; then
+    echo start $1
+    python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 200 --batch 8  
+    python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert roberta
+    python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 400 --batch 8 --update_count 2 --bert xlnet
+    python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert bigbird
+    python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert longformer
+    # python main.py --lr 1e-4 --epoch 20 --dataset cve_data_with_reference_splitted_by_year --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert docbert
+
+    python ensemble.py --dataset cve_data_with_reference_splitted_by_year
 fi
