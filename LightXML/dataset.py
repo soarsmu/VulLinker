@@ -19,12 +19,15 @@ def createDataCSV(dataset):
                 'amazoncat13k': 'AmazonCat-13K',
                 'amazon670k': 'Amazon-670K',
                 'eurlex4k': 'Eurlex-4K',
-                'cve_data': 'cve_data'}
+                'cve_data': 'cve_data',
+                'cve_data_splitted_by_year': 'cve_data_splitted_by_year',
+                'cve_data_with_reference_splitted_by_year': 'cve_data_with_reference_splitted_by_year',
+                }
 
     assert dataset in name_map
     dataset = name_map[dataset]
 
-    fext = '_texts.txt' if dataset == 'Eurlex-4K' or dataset == 'cve_data' else '_raw_texts.txt'
+    fext = '_texts.txt' if dataset == 'Eurlex-4K' or 'cve_data' in dataset else '_raw_texts.txt'
     with open(f'./data/{dataset}/train{fext}') as f:
         for i in tqdm.tqdm(f):
             texts.append(i.replace('\n', ''))
