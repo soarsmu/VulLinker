@@ -46,7 +46,7 @@ Please make sure that the folder exist in the Utility/dataset/ directory before 
 - Data preparation utility function is available in Utilities/data_preparation.py **prepare_fastxml_dataset()** function. 
 - This function make use of the splitted_train_x.npy, splitted_test_x.npy (the pre-splitted numpy dataset), and the cve_labels_merged_cleaned.csv (the csv file containing all the entries)
 - To make the dataset consistent, it would be good to use the **dataset_train.csv** and **dataset_test.csv** available in the utilities/dataset/splitted/splitted_dataset_csv.zip and change the **merged column** to the text that we want as the feature.
-- Then, to convert these two csv files into the numpy array, you can use the **save_splitted_dataset_as_numpy()** function in the data_preparation file.
+- Then, to convert these two csv files into the numpy array, you can use the **split_dataset()** function in the data_preparation file.
 - After you have created the **train.json** and **test.json** for FastXML, copy the two files into FastXML/dataset folder
 
 ### Training Process
