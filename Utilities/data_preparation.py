@@ -8,17 +8,19 @@ import json
 import sklearn
 import pickle
 
-TRAIN_PATH = "dataset/dataset_train.csv"
-TEST_PATH = "dataset/dataset_test.csv"
-
-FEATURE_NAME = "merged"
-DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
-
 ## use this for the original csv file from ICPC paper
-NON_LABEL_COLUMNS = ["cve_id", "description_text", "cpe_text", "merged"]
+# TRAIN_PATH = "dataset/dataset_train.csv"
+# TEST_PATH = "dataset/dataset_test.csv"
+# FEATURE_NAME = "merged"
+# DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
+# NON_LABEL_COLUMNS = ["cve_id", "description_text", "cpe_text", "merged"]
 
 ## use this for the new combined description and reference data
-# NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
+TRAIN_PATH = "dataset/zero_shot_train_cleaned.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
+TEST_PATH = "dataset/zero_shot_test_cleaned.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
+FEATURE_NAME = "description_and_reference"
+DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
+NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
 
 
 # According to the usual division, we divide the dataset into 0.75:0.25 between the training and test data
@@ -103,7 +105,7 @@ def prepare_lightxml_dataset():
     train_data = pd.read_csv(TRAIN_PATH)
     # process the label and text here
     for index, row in train_data.iterrows():
-        train_text.append(row.merged.lstrip().rstrip())
+        train_text.append(row[FEATURE_NAME].lstrip().rstrip())
         # for label below
         label = cve_labels[cve_labels["cve_id"] == row.cve_id]
         label_unsplit = label.labels.values[0]
@@ -117,7 +119,7 @@ def prepare_lightxml_dataset():
 
     test_data = pd.read_csv(TEST_PATH)
     for index, row in test_data.iterrows():
-        test_text.append(row.merged.lstrip().rstrip())
+        test_text.append(row[FEATURE_NAME].lstrip().rstrip())
         # for label below
         label = cve_labels[cve_labels["cve_id"] == row.cve_id]
         label_unsplit = label.labels.values[0]
