@@ -13,14 +13,14 @@ import pickle
 # TEST_PATH = "dataset/dataset_test.csv"
 # FEATURE_NAME = "merged"
 # DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
-# NON_LABEL_COLUMNS = ["cve_id", "description_text", "cpe_text", "merged"]
+NON_LABEL_COLUMNS = ["cve_id", "description_text", "cpe_text", "merged", "description_and_reference"]
 
 ## use this for the new combined description and reference data
-TRAIN_PATH = "dataset/zero_shot_train_cleaned.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
-TEST_PATH = "dataset/zero_shot_test_cleaned.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
+TRAIN_PATH = "dataset/dataset_train_reference.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
+TEST_PATH = "dataset/dataset_test_reference.csv" # please change the csv name later, I use zero shot to indicate that we get this csv file from Vulnerability_Report_Tool_Paper repo
 FEATURE_NAME = "description_and_reference"
 DESCRIPTION_FIELDS = ["cve_id", FEATURE_NAME]
-NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
+# NON_LABEL_COLUMNS = ["cve_id", "cleaned", "matchers", "merged", "reference", "description_and_reference", "year"]
 
 
 # According to the usual division, we divide the dataset into 0.75:0.25 between the training and test data
@@ -33,7 +33,8 @@ def split_dataset():
     description_fields = DESCRIPTION_FIELDS
     # Initiate the dataframe containing the CVE ID and its description
     # Change the "merged" field in the description_fields variable to use other text feature such as reference
-    df = pd.read_csv(TRAIN_PATH, usecols=description_fields)
+    df = pd.read_csv(TRAIN_PATH, dtype=str, usecols=description_fields)
+    #df.description_and_reference = df.description_and_reference.astype(str)
     # Read column names from file
     cols = list(pd.read_csv(TRAIN_PATH, nrows=1))
     # Initiate the dataframe containing the labels for each CVE
@@ -41,11 +42,27 @@ def split_dataset():
                             usecols=[i for i in cols if i not in NON_LABEL_COLUMNS])
     # Initiate a list which contain the list of labels considered in te dataset
     list_labels = [i for i in cols if i not in NON_LABEL_COLUMNS]
+    print(list_labels)
     # Convert to numpy for splitting
-    data = df.to_numpy()
-    labels = pd_labels.to_numpy()
+    train = df.to_numpy()
+    label_train = pd_labels.to_numpy()
+    
+    df2 = pd.read_csv(TEST_PATH, dtype=str, usecols=description_fields)
+    #df2.description_and_reference = df2.description_and_reference.astype(str)
+    # Read column names from file
+    cols2 = list(pd.read_csv(TEST_PATH, nrows=1))
+    # Initiate the dataframe containing the labels for each CVE
+    pd_labels2 = pd.read_csv(TEST_PATH,
+                            usecols=[i for i in cols if i not in NON_LABEL_COLUMNS])
+    # Initiate a list which contain the list of labels considered in te dataset
+    list_labels2 = [i for i in cols if i not in NON_LABEL_COLUMNS]
+    # Convert to numpy for splitting
+    test = df2.to_numpy()
+    label_test = pd_labels2.to_numpy()
+    # print(df2)
+    # print(df)
     # Splitting using skmultilearn iterative train test split
-    train, label_train, test, label_test = iterative_train_test_split(data, labels, test_size=0.25)
+    #train, label_train, test, label_test = iterative_train_test_split(data, labels, test_size=0.25)
     # Save the splitted data to files
     np.save("dataset/splitted/splitted_train_x.npy", train, allow_pickle=True)
     np.save("dataset/splitted/splitted_train_y.npy", label_train, allow_pickle=True)
@@ -429,4 +446,5 @@ def prepare_xmlcnn_dataset():
 
 
 if __name__ == "__main__" :
+    split_dataset()
     prepare_lightxml_dataset()

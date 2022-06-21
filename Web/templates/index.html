@@ -23,7 +23,7 @@
 	<div class="page-content">
 		<div class="form-v4-content">
 			<div class="form-left">
-				<h2>Library Identification from Vulnerabilities</h2>
+				<h2>Library Identification from NVD Entry</h2>
 				<p class="text-1">Software engineers depend heavily on software libraries and have to update their dependencies once vulnerabilities are found in them. A key challenge is the identification of libraries related to a given reported vulnerability in the National Vulnerability Database (NVD), which may not explicitly indicate the affected libraries. </p>
 				<p class="text-2">In this work, we build a tool to predict a set of relevant libraries from NVD report.</p>
 				<div class="form-left-last">
@@ -44,11 +44,11 @@
 				<h3 style="margin-left: -40px;"><span>or</span></h3>
 				<form class="form-detail" action="{% url 'predict' %}">
 					<div class="form-row">
-						<label>CVE Description Text</label>
+						<label>Vulnerability Report Text</label>
 						<input type="text" class="input-text" id="input_text" name="input_text" size="100">
 					</div>
 					<div class="form-row-last">
-						<input type="submit" class="predict-description" value='Get Prediction by CVE Description'>
+						<input type="submit" class="predict-description" value='Get Prediction by Text'>
 					</div>
 				</form>
 			</div>

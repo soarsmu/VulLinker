@@ -162,4 +162,4 @@ def predict_by_cve_id(request):
 
     result=get_prediction(description)
 
-    return render(request, 'predict.html', {'result': result})
+    return render(request, 'predict.html', {'result': result, 'cve_id': cve_id})
