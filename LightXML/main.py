@@ -19,7 +19,7 @@ import torch
 
 from torch.utils.data import DataLoader
 from dataset import MDataset, createDataCSV
-from log import Logger
+from logging import Logger
 
 def load_group(dataset, group_tree=0):
     if dataset == 'wiki500k':
@@ -85,7 +85,7 @@ def train(model, df, label_map):
             log_str += f' {g_p1:.4f}, {g_p3:.4f}, {g_p5:.4f}'
         if args.valid:
             log_str += ' valid'
-        LOG.log(log_str)
+        #LOG.log(log_str)
 
         if max_only_p5 < p5:
             max_only_p5 = p5
