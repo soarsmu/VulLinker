@@ -140,9 +140,6 @@ cython_debug/
 *.zip
 
 *.bin
-*.txt
-*.csv
-*.npy
 log*
 
 .DS_Store
