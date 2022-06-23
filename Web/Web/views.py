@@ -8,6 +8,10 @@ import torch
 import torch
 from torch.utils.data import DataLoader
 from urllib.parse import urlparse
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import re
 
 
 from deployed_model import model, tokenizer, label_map, inverse_label_map, MDataset
@@ -89,12 +93,68 @@ def get_prediction(input_text: str) -> str:
 
     return prediction_labels   
 
+def basic_cleaning(text):
+    text = str(text)
+    # Lowercase text
+    text = text.lower()
+    # Remove punctuation
+    text = re.sub(r'[^\w\s]','',text)
+    # Remove redundant whitespaces
+    text = ' '.join(text.split())
+    return text
+
+
+def nouns_only(text):
+    tagged_text = nltk.tag.pos_tag(text.lower().split())
+    editted_text = [word for word,tag in tagged_text if tag == 'NNP' or tag == 'NNPS' or tag=="NN" or tag=="NNS"]
+    editted_text = " ".join(editted_text)
+    editted_text = re.sub(r'[^\w\s]','',editted_text)
+    editted_text = ' '.join(editted_text.split())
+    return editted_text
+
+
+def get_freq_dict(text):
+    freq_dict = {}
+    text = text.lower()
+    text = re.sub(r'[^\w\s]','',text)
+    text_tokens = word_tokenize(text)
+    for tok in text_tokens:
+        if tok not in freq_dict:
+            freq_dict[tok] = 1
+        else:
+            freq_dict[tok] += 1
+    freq_dict = {k: v for k, v in sorted(freq_dict.items(), key=lambda item: item[1], reverse=True)}
+    return freq_dict
+
+def frequent_words(text, proportion):
+    text = text.lower()
+    text = re.sub(r'[^\w\s]','',text)
+    freq_dict = get_freq_dict(text)
+    #round down
+    num_words_to_remove = int(proportion * len(freq_dict))
+    keys_to_remove = list(freq_dict.keys())[:num_words_to_remove]
+    return keys_to_remove
+
+def remove_frequent_words(text):
+    try:
+        text = re.sub(r'[^\w\s]','',text)
+        word_tokens = word_tokenize(text.lower())
+        filtered_sentence = []
+        for w in word_tokens:
+            if w not in freq_words:
+                filtered_sentence.append(w)
+        filtered_sentence = " ".join(filtered_sentence)
+        filtered_sentence = re.sub(r'[^\w\s]','',filtered_sentence)
+        filtered_sentence = ' '.join(filtered_sentence.split())
+        return filtered_sentence
+    except:
+        return text
 
 # our result page view
 def predict(request):
     input_text = request.GET['input_text']
     
-    result = get_prediction(input_text)
+    result = get_prediction(nouns_only(basic_cleaning(input_text)))
 
     return render(request, 'predict.html', {'result': result})
 
@@ -109,12 +169,27 @@ def predict_by_cve_id(request):
     r = nvdlib.getCVE(cve_id)
         
     description = r.cve.description.description_data[0].value
-    
+    cpe = []
+    cpe_text = ""
+    config_cpe = r.configurations.nodes
+    for eachNode in config_cpe:
+        for eachCpe in eachNode.cpe_match:
+            cpe.append(eachCpe.cpe23Uri)
+            temp_cpe = eachCpe.cpe23Uri
+            list_split = temp_cpe.split(":")
+            cpe_text += list_split[3]
+            cpe_text += " "
+            cpe_text += list_split[4]
+            cpe_text += " "
     reference_links = []
     for ref in r.cve.references.reference_data:
         reference_links.append(ref.url)
     reference_descs = []
+    reference_link_text = ""
     for ref in reference_links:
+        temp_ref = re.sub('[^0-9a-zA-Z]+', ' ', ref)
+        reference_link_text += re.sub(' +', ' ', temp_ref)
+        reference_link_text += " "
         short_ref = urlparse(ref).netloc
         if "bugs.launchpad.net" in short_ref:
             reference_descs.append(crawl_bugs_launchpad(ref))
@@ -159,7 +234,12 @@ def predict_by_cve_id(request):
                 reference_descs.append(crawl_ubuntu(ref))
         else:
             reference_descs.append("")
+    updated_desc = nouns_only(basic_cleaning(description))
+    reference_text = ""
+    for i_text in reference_descs:
+        reference_text += nouns_only(basic_cleaning(i_text))
+        reference_text += " "
+    result=get_prediction(updated_desc+reference_link_text+cpe_text)
 
-    result=get_prediction(description)
 
     return render(request, 'predict.html', {'result': result, 'cve_id': cve_id})
