@@ -51,11 +51,12 @@ def train(model, df, label_map):
                                      shuffle=False)
     else:
         train_d = MDataset(df, 'train', tokenizer, label_map, args.max_len)
-        test_d = MDataset(df, 'test', tokenizer, label_map, args.max_len)
         trainloader = DataLoader(train_d, batch_size=args.batch, num_workers=2,
                                  shuffle=True)
-        testloader = DataLoader(test_d, batch_size=args.batch, num_workers=1,
-                                shuffle=False)
+        if args.valid:
+            valid_d = MDataset(df, 'valid', tokenizer, label_map, args.max_len)
+            validloader = DataLoader(valid_d, batch_size=args.batch, num_workers=0, 
+                                     shuffle=False)
 
     model.cuda()
     no_decay = ['bias', 'LayerNorm.weight']
@@ -70,13 +71,11 @@ def train(model, df, label_map):
     max_only_p5 = 0
     for epoch in range(0, args.epoch+5):
         train_loss = model.one_epoch(epoch, trainloader, optimizer, mode='train',
-                                     eval_loader=validloader if args.valid else testloader,
+                                     eval_loader=validloader,
                                      eval_step=args.eval_step, log=LOG)
 
         if args.valid:
             ev_result = model.one_epoch(epoch, validloader, optimizer, mode='eval')
-        else:
-            ev_result = model.one_epoch(epoch, testloader, optimizer, mode='eval')
 
         g_p1, g_p3, g_p5, p1, p3, p5 = ev_result
 
@@ -158,7 +157,7 @@ if __name__ == '__main__':
     df, label_map = createDataCSV(args.dataset)
     if args.valid:
         train_df, valid_df = train_test_split(df[df['dataType'] == 'train'],
-                                              test_size=4000,
+                                              test_size=400,
                                               random_state=1240)
         df.iloc[valid_df.index.values, 2] = 'valid'
         print('valid size', len(df[df['dataType'] == 'valid']))
