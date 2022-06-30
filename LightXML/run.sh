@@ -75,11 +75,11 @@ elif [ "$1" = "eurlex4k" ]; then
     python src/ensemble.py --dataset eurlex4k
 elif [ "$1" = "cve_data" ]; then
     echo start $1
-    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  
-    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert roberta
-    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 400 --batch 8 --update_count 2 --bert xlnet
-    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert bigbird
-    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert longformer
+    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8 --valid
+    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8 --valid --bert roberta
+    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 400 --batch 8 --valid --update_count 2 --bert xlnet
+    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8 --valid --bert bigbird
+    python main.py --lr 1e-4 --epoch 30 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8 --valid --bert longformer
     # python main.py --lr 1e-4 --epoch 20 --dataset cve_data --swa --swa_warmup 10 --swa_step 200 --batch 8  --bert docbert
 
     python ensemble.py --dataset cve_data
